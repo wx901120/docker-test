@@ -1,45 +1,47 @@
-const http = require('http')
-const path = require('path')
-const fs = require('fs')
-const {execFile} = require('child_process')
+const http = require("http")
+const {execSync} = require("child_process")
+const fs = require("fs")
+const path = require("path")
 
-// 递归遍历删除目录
-function deleteFolderRecursive(path){
-    if(fs.existsSync(path)){
-        fs.readdirSync(path).forEach((file)=>{
-            const curPath = path + '/' + file
-            if(fs.statSync(curPath).isDirectory()){
-                deleteFolderRecursive(curPath)
-            }else{
-                fs.unlinkSync(curPath)
+// 递归删除目录
+function deleteFolderRecursive(path) {
+    if (fs.existsSync(path)) {
+        fs.readdirSync(path).forEach(function (file) {
+            const curPath = path + "/" + file;
+            if (fs.statSync(curPath).isDirectory()) { // recurse
+                deleteFolderRecursive(curPath);
+            } else { // delete file
+                fs.unlinkSync(curPath);
             }
-        })
-        fs.rmdirSync(path)
+        });
+        fs.rmdirSync(path);
     }
 }
-const resolvePost = req => {
-    return new Promise(resolve => {
-        let chunk = ''
-        req.on('data', data => {
-            console.log('data',data);
-            chunk += data
-        })
-        req.on('end', () => {
-            resolve(JSON.parse(chunk))
-        })
-    })
-}
+
+const resolvePost = req =>
+    new Promise(resolve => {
+        let chunk = "";
+        req.on("data", data => {
+            chunk += data;
+        });
+        req.on("end", () => {
+            resolve(JSON.parse(chunk));
+        });
+    });
 
 http.createServer(async (req, res) => {
+    console.log('receive request')
+    console.log(req.url)
     if (req.method === 'POST' && req.url === '/') {
-        const data = await resolvePost(req)
+        const data = await resolvePost(req);
         const projectDir = path.resolve(__dirname,`./${data.repository.name}`)
         deleteFolderRecursive(projectDir)
 
         // 拉取仓库最新代码
-        execFile(`git clone https://github.com/wx901120/${data.repository.name}.git ${projectDir}`,{
-            stdio:'inherit',
+        execSync(`git clone https://github.com/yeyan1996/${data.repository.name}.git ${projectDir}`, {
+            stdio: 'inherit',
         })
+
         // 复制 Dockerfile 到项目目录
         fs.copyFileSync(path.resolve(__dirname,`./Dockerfile`), path.resolve(projectDir, './Dockerfile'))
 
@@ -64,7 +66,7 @@ http.createServer(async (req, res) => {
             stdio: 'inherit',
         })
 
-        // 创建 docker 容器，端口号8888
+        // 创建 docker 容器
         execSync(`docker run -d -p 8888:80 --name ${data.repository.name}-container ${data.repository.name}-image:latest`, {
             stdio: 'inherit',
         })
@@ -72,6 +74,6 @@ http.createServer(async (req, res) => {
         console.log('deploy success')
     }
     res.end('ok')
-}).listen(8888, () => {
+}).listen(3000, () => {
     console.log('server is ready')
 })
