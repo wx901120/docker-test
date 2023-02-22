@@ -15,6 +15,9 @@ concurrency:
   cancel-in-progress: true
 jobs:
   build:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout # 1. clone代码
