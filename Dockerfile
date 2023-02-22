@@ -3,9 +3,10 @@
 FROM node:lts-alpine as build-stage
 WORKDIR /app
 COPY package*.json ./
+COPY yarn.lock ./
 RUN yarn install
 COPY . .
-RUN yarn build
+RUN yarn && yarn build
 
 # production stage
 FROM nginx:stable-alpine as production-stage
@@ -15,5 +16,5 @@ CMD ["nginx", "-g", "daemon off;"]
 
 # 本地测试
 # FROM nginx
-# COPY ./test.html /usr/share/nginx/html/index.html
+# COPY ./dist /usr/share/nginx/html
 # EXPOSE 80
