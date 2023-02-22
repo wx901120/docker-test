@@ -3,6 +3,16 @@ on:
   push:
     branches:
       - "main"
+# 设置 GITHUB_TOKEN 的权限，以允许部署到 GitHub Pages。
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 允许一个并发的部署
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
 jobs:
   build:
     runs-on: ubuntu-latest
