@@ -55,3 +55,10 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/vite:1.0.0
+      - name: executing remote ssh commands using password    # 通过ssh方式登录云服务器
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.TENCENT_CLOUD_IP }} #云服务器的ip
+          username: ${{ secrets.TENCENT_CLOUD_NAME }} #云服务器的用户名
+          password: ${{ secrets.TENCENT_CLOUD_PASSWORD }} #云服务器的密码
+          script: cd ~ && sh ./scripts/deploy.sh ${{ secrets.DOCKERHUB_USERNAME }} ${{ secrets.DOCKERHUB_TOKEN }} #运行脚本
