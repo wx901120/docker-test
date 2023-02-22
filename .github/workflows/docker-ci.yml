@@ -22,22 +22,22 @@ jobs:
     steps:
       - name: Checkout # 1. clone代码
         uses: actions/checkout@v3
-      - name: Set up Node # 设置node版本
+      - name: Set up Node # 2. 设置node版本
         uses: actions/setup-node@v3
         with:
           node-version: 18
           cache: 'npm'
-      - name: Install dependencies and Build # 安装依赖并构建
+      - name: Install dependencies and Build # 3.安装依赖并构建
         run: |
           yarn install
           yarn build
-      - name: Setup Pages
-        uses: actions/configure-pages@v3
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
-        with:
-          # Upload dist repository
-          path: './dist'
+      # - name: Setup Pages
+      #   uses: actions/configure-pages@v3
+      # - name: Upload artifact
+      #   uses: actions/upload-pages-artifact@v1
+      #   with:
+      #     # Upload dist repository
+      #     path: './dist'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1
