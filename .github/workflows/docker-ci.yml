@@ -54,7 +54,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/vite:1.0.1
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/vite:1.0.0
       - name: executing remote ssh commands using password    # 通过ssh方式登录云服务器
         uses: appleboy/ssh-action@v0.1.7
         with:
